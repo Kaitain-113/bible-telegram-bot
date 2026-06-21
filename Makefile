@@ -1,8 +1,16 @@
+.PHONY: tests
+
+ifeq ($(debug),1)
+    PYTHON_CMD := uv run python -m debugpy --listen 5678 --wait-for-client -m
+else
+    PYTHON_CMD := uv run python -m
+endif
+
 run:
-	uv run bible-cli query "$(ARGS)"
+	$(PYTHON_CMD) bible_telegram_bot.app
 
 tests:
-	pytest -s ./tests/** --cov-report=term-missing --cov-report=html -v
+	$(PYTHON_CMD) pytest -s ./tests/** --cov-report=term-missing --cov-report=html -v
 
 check:
 	uv run ruff check --fix
@@ -16,6 +24,9 @@ install:
 update:
 	uv sync
 
-make release:
+release:
 	cz bump
 	git push --follow-tags
+
+debug:
+	uv run python -m debugpy --listen 5678 --wait-for-client -m bible_telegram_bot.app
